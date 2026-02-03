@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<keyboard version="1">
+    <commands>
+        <key command="cm_pick_left_color" shortcut="Alt+Z" />
+        <key command="cm_pick_right_color" shortcut="Alt+X" />
+    </commands>
+</keyboard>
