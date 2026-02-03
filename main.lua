@@ -1,5 +1,5 @@
 local dlg = Dialog { id = "cm_d", title = "Color mixer", visible = false }
-local MIX_STEP = 15
+local MIX_STEP = 14
 local DEFAULT_PERCENT = 50
 
 local state = {
@@ -207,10 +207,6 @@ local function get_mix_space()
     return dlg.data.mixSpace or "linear-srgb"
 end
 
-local function get_shortest_hue()
-    return dlg.data.shortestHue == true
-end
-
 local function lab_to_lch(lab)
     local c = math.sqrt(lab.a * lab.a + lab.b * lab.b)
     local h = math.deg(math.atan(lab.b, lab.a))
@@ -385,24 +381,24 @@ local function mix_anime(orig, dest, t, presetName)
     return colorShift(base, hueShift, satShift, lightShift, 0)
 end
 
-local function mix_color_at_percent(percent, mixSpace, shortestHue)
+local function mix_color_at_percent(percent, mixSpace)
     local t = percent / 100.0
     if mixSpace == "sr-lab-2" then return mix_lab(state.left, state.right, t) end
-    if mixSpace == "lch" then return mix_lch(state.left, state.right, t, shortestHue) end
+    if mixSpace == "lch" then return mix_lch(state.left, state.right, t, true) end
     if mixSpace == "oklab" then return mix_oklab(state.left, state.right, t) end
-    if mixSpace == "oklch" then return mix_oklch(state.left, state.right, t, shortestHue) end
+    if mixSpace == "oklch" then return mix_oklch(state.left, state.right, t, true) end
     return mix_linear_srgb(state.left, state.right, t)
 end
 
-local function build_mix_shades(step, mixSpace, shortestHue)
+local function build_mix_shades(step, mixSpace)
     local colors = {}
     local count = math.floor(100 / step)
     for i = 0, count do
         local percent = i * step
-        colors[#colors + 1] = mix_color_at_percent(percent, mixSpace, shortestHue)
+        colors[#colors + 1] = mix_color_at_percent(percent, mixSpace)
     end
     if (100 % step) ~= 0 then
-        colors[#colors + 1] = mix_color_at_percent(100, mixSpace, shortestHue)
+        colors[#colors + 1] = mix_color_at_percent(100, mixSpace)
     end
     return colors
 end
@@ -423,7 +419,7 @@ end
 local function update_mix_shades()
     dlg:modify {
         id = "mix",
-        colors = build_mix_shades(MIX_STEP, get_mix_space(), get_shortest_hue()),
+        colors = build_mix_shades(MIX_STEP, get_mix_space()),
     }
     dlg:modify {
         id = "mix_anime_soft",
@@ -617,12 +613,7 @@ end
 
 local function handle_mix_space_change()
     update_mix_shades()
-    set_fg_color(mix_color_at_percent(state.percent, get_mix_space(), get_shortest_hue()))
-end
-
-local function handle_shortest_hue_change()
-    update_mix_shades()
-    set_fg_color(mix_color_at_percent(state.percent, get_mix_space(), get_shortest_hue()))
+    set_fg_color(mix_color_at_percent(state.percent, get_mix_space()))
 end
 
 local function handle_anime_click(ev)
@@ -643,7 +634,7 @@ local function add_to_palette()
     local pal = spr.palettes[1]
     if not pal then return end
 
-    local mixed = mix_color_at_percent(state.percent, get_mix_space(), get_shortest_hue())
+    local mixed = mix_color_at_percent(state.percent, get_mix_space())
 
     local ncolors = #pal
     pal:resize(ncolors + 1)
@@ -676,7 +667,7 @@ function main(plugin)
                 handle_right_color_change()
             end
         }
-        :shades { id = "mix", colors = build_mix_shades(MIX_STEP, "linear-srgb", true),
+        :shades { id = "mix", colors = build_mix_shades(MIX_STEP, "linear-srgb"),
             onclick = function(ev)
                 handle_mix_click(ev)
             end }
@@ -686,14 +677,6 @@ function main(plugin)
             options = { "linear-srgb", "sr-lab-2", "lch", "oklab", "oklch" },
             onchange = function()
                 handle_mix_space_change()
-            end
-        }
-        :check {
-            id = "shortestHue",
-            text = "Shortest Hue",
-            selected = true,
-            onclick = function()
-                handle_shortest_hue_change()
             end
         }
     dlg:newrow()
