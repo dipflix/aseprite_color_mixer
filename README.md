@@ -23,3 +23,14 @@ Mix two colors with multiple color spaces, pick from preset ramps, and generate 
 4. Use **Generate** to build palette rows from the current fg color.
 5. Click any generated swatch to set fg color.
 6. Use **Add to Palette** to append the current mix result.
+
+
+## Donate
+
+If you want to support this project, you can send a donation to the address below.
+
+USDT (ERC20 / Ethereum): `0xba47307f0fbc0872d0368b425db52965f1a2eccd`
+
+USDT (Solana / SPL): `9BEWhkbi7odtxC9xdeNHkrh97o4usnF52bPKLJxH3w3D`
+
+USDT (TON): `UQDFqU5LMc9BUQ92fPtPMEv5HU0y1GWDWcSPPhFZb-_IlGLk``UQDFqU5LMc9BUQ92fPtPMEv5HU0y1GWDWcSPPhFZb-_IlGLk`
